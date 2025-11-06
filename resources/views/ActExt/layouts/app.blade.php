@@ -225,7 +225,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.certificacion.ingles') }}">
+                <a class="nav-link" href="{{ route('admin.certificacion.index') }}">
                     <i class="fa-solid fa-award"></i> Certificación de Inglés
                 </a>
             </li>

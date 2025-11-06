@@ -18,7 +18,9 @@ use App\Http\Controllers\TeamTaskController;
 use App\Models\RecurseEC;
 use App\Models\TeamTask;
 use Faker\Provider\ar_EG\Person;
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\CertificacionController;
+
 
 Route::prefix('api')->group(function () {
     require base_path('routes/api.php');
@@ -169,6 +171,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/eliminar-imagen-carr/{nombre}',[Personalizacion::class,'eliminarImagenCarrusel'])->name('eliminar.imagen.carrusel');
     
     Route::get('/eliminar-banner-gif/{nombre}',[Personalizacion::class,'eliminarBannerGif'])->name('eliminar.banner.gif');
+
+    // Certificación (administrador)
+    Route::get('/admin/certificacion', [CertificacionController::class, 'index'])->name('admin.certificacion.index');
+    Route::get('/admin/certificacion/exportar', [CertificacionController::class, 'exportarExcel'])->name('certificacion.exportar');
+    
+    //Validaciones
+    Route::post('/certificacion/{id}/validar', [CertificacionController::class, 'validar'])->name('certificacion.validar');
+    Route::post('/certificacion/{id}/rechazar', [CertificacionController::class, 'rechazar'])->name('certificacion.rechazar');
+
 });
 
 // Cerra Sesión

@@ -9,14 +9,11 @@ class Certificacion extends Model
 {
     use HasFactory;
 
-    protected $table = 'certificacion'; // Define el nombre de la tabla
-    protected $primaryKey = 'id';
-
-    // Habilitar timestamps
-    public $timestamps = true;
+    // Especificar el nombre correcto de la tabla
+    protected $table = 'certificacion';
 
     protected $fillable = [
-        'id_usuario', // Relación con la tabla usuarios
+        'id_usuario',
         'nombre',
         'matricula',
         'correo',
@@ -24,13 +21,8 @@ class Certificacion extends Model
         'grupo_ingles',
         'nivel_in',
         'certificado',
+        'archivo',
         'puntaje',
         'estatus',
     ];
-
-    // Definir la relación inversa con el modelo Usuario
-    public function usuario()
-    {
-        return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
-    }
 }
