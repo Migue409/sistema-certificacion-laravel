@@ -11,6 +11,7 @@ class Certificacion extends Model
 
     // Especificar el nombre correcto de la tabla
     protected $table = 'certificacion';
+    protected $primaryKey = 'id_usuario';
 
     protected $fillable = [
         'id_usuario',

@@ -9,7 +9,6 @@ class CertificadosExport implements FromCollection
 {
  public function collection()
     {
-        // Selecciona solo las columnas que quieras exportar
         return Certificacion::select(
         'id_usuario', 
         'nombre', 

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CertificadosExport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class CertificacionController extends Controller
 {
@@ -22,15 +24,6 @@ class CertificacionController extends Controller
 {
     return Excel::download(new CertificadosExport, 'certificados.xlsx');
 }
-
-
-    // Generar dictamen (ejemplo: descargar PDF o generar reporte)
-    public function generarDictamen()
-    {
-        // Aquí implementa la lógica para generar dictamen
-        // Ejemplo: retornar un PDF o mensaje
-        return redirect()->back()->with('success', 'Dictamen generado correctamente.');
-    }
 
     public function validar($id)
 {
@@ -58,7 +51,26 @@ public function rechazar($id)
     $cert->estatus = 'Rechazado';
     $cert->save();
 
-    return response()->json(['message' => 'Certificado rechazado correctamente.']);
+    return response()->json(['message' => 'Certificado rechazado.']);
+}
+
+public function aprobar($id)
+{
+    $certificacion = Certificacion::findOrFail($id);
+    $certificacion->estatus = 'Aprobado';
+    $certificacion->save();
+
+    // Generar PDF automáticamente
+    $pdf = Pdf::loadView('ActExt.administrador.dictamen', compact('certificacion'));
+
+    // Retornar el PDF como descarga inmediata
+    return $pdf->download('Dictamen_' . $certificacion->matricula . '.pdf');
+
+    // Guardar en almacenamiento interno (storage/app/public/dictamenes)
+    Storage::disk('public')->put('dictamenes/' . $fileName, $pdf->output());
+
+    // Retornar descarga inmediata al administrador
+    return $pdf->download($fileName);
 }
 
 }

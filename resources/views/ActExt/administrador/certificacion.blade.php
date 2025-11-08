@@ -55,7 +55,8 @@
 
         <div>
             <a href="{{ route('certificacion.exportar') }}" class="btn btn-success mr-2">Exportar en Excel</a>
-            <a id="btnDictamen" href="#" class="btn btn-success" style="background-color:#90EE90; border-color:#90EE90;" disabled>Generar dictamen</a>
+            <!--<a id="btnDictamen" href="#" class="btn btn-success" style="background-color:#90EE90; border-color:#90EE90;" disabled>Generar dictamen</a>-->
+            <button id="btnDictamen" class="btn btn-success" disabled style="background-color:#90EE90; border-color:#90EE90;">Generar dictamen</button>
         </div>
     </div>
 
@@ -70,6 +71,7 @@
                 <th>Nivel</th>
                 <th>Certificado</th>
                 <th>Estatus</th>
+
             </tr>
         </thead>
         <tbody>
@@ -79,17 +81,17 @@
             data-id="{{ $certificado->id_usuario }}" 
             data-nombre="{{ $certificado->nombre }}"
             data-matricula="{{ $certificado->matricula }}"
-            data-nivel="{{ $certificado->nivel }}"
+            data-nivel="{{ $certificado->nivel_in }}"
             data-certificado="{{ $certificado->certificado }}">
             <td>{{ $certificado->nombre }}</td>
             <td>{{ $certificado->matricula }}</td>
             <td>{{ $certificado->correo }}</td>
             <td>{{ $certificado->division }}</td>
-            <td>{{ $certificado->grupo }}</td>
-            <td>{{ $certificado->nivel }}</td>
+            <td>{{ $certificado->grupo_ingles }}</td>
+            <td>{{ $certificado->nivel_in }}</td>
             <td>{{ $certificado->certificado }}</td>
             <td>{{ $certificado->estatus }}</td>
-        </tr>
+</tr>
     @empty
         <tr>
             <td colspan="8" class="text-center">No hay certificados disponibles.</td>
@@ -104,63 +106,85 @@
 </div>
 @endsection
 
+@push('scripts')
 <script>
-let selected = null;
+document.addEventListener('DOMContentLoaded', function () {
+    const filas = document.querySelectorAll('.fila-certificacion');
+    const btnDictamen = document.getElementById('btnDictamen');
+    let selected = null;
 
-document.querySelectorAll('.fila-certificacion').forEach(row => {
-    row.addEventListener('click', () => {
-        selected = {
-            id: row.dataset.id,
-            nombre: row.dataset.nombre,
-            matricula: row.dataset.matricula,
-            nivel: row.dataset.nivel,
-            certificado: row.dataset.certificado
+    filas.forEach(row => {
+        row.addEventListener('click', function () {
+            // Si la misma fila se vuelve a hacer clic → deselecciona
+            if (selected === this) {
+                this.classList.remove('table-primary');
+                selected = null;
+                btnDictamen.disabled = true;
+                btnDictamen.style.backgroundColor = '#90EE90';
+                btnDictamen.style.borderColor = '#90EE90';
+                return;
+            }
+
+            // Quita selección anterior (si había otra)
+            if (selected) selected.classList.remove('table-primary');
+
+            // Selecciona la nueva fila
+            this.classList.add('table-primary');
+            selected = this;
+
+            // Activa el botón
+            btnDictamen.disabled = false;
+            btnDictamen.style.backgroundColor = '#198754';
+            btnDictamen.style.borderColor = '#198754';
+        });
+    });
+
+    // Al presionar "Generar dictamen"
+    btnDictamen.addEventListener('click', e => {
+        e.preventDefault();
+        if (!selected) return;
+
+        const datos = {
+            id: selected.dataset.id,
+            nombre: selected.dataset.nombre,
+            matricula: selected.dataset.matricula,
+            nivel: selected.dataset.nivel,
+            certificado: selected.dataset.certificado
         };
 
-        // Activar botón
-        const btn = document.getElementById('btnDictamen');
-        btn.disabled = false;
-        btn.style.backgroundColor = '#28a745'; // verde fuerte
-        btn.style.borderColor = '#28a745';
+        // Llenar modal
+        document.getElementById('id_usuario').value = datos.id;
+        document.getElementById('nombre').value = datos.nombre;
+        document.getElementById('matricula').value = datos.matricula;
+        document.getElementById('nivel').value = datos.nivel;
+        document.getElementById('certificado').value = datos.certificado;
+
+        // Mostrar modal
+        new bootstrap.Modal(document.getElementById('modalDictamen')).show();
     });
+
+    document.getElementById('btnValidar').addEventListener('click', () => procesarDictamen('validar'));
+    document.getElementById('btnRechazar').addEventListener('click', () => procesarDictamen('rechazar'));
+
+    function procesarDictamen(accion) {
+        if (!selected) return;
+
+        fetch(`/certificacion/${selected.dataset.id}/${accion}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch(err => console.error(err));
+    }
 });
-
-document.getElementById('btnDictamen').addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!selected) return;
-
-    // Llenar modal
-    document.getElementById('id_usuario').value = selected.id;
-    document.getElementById('nombre').value = selected.nombre;
-    document.getElementById('matricula').value = selected.matricula;
-    document.getElementById('nivel').value = selected.nivel;
-    document.getElementById('certificado').value = selected.certificado;
-
-    // Mostrar modal
-    new bootstrap.Modal(document.getElementById('modalDictamen')).show();
-});
-
-document.getElementById('btnValidar').addEventListener('click', () => {
-    procesarDictamen('validar');
-});
-
-document.getElementById('btnRechazar').addEventListener('click', () => {
-    procesarDictamen('rechazar');
-});
-
-function procesarDictamen(accion) {
-    fetch(`/certificacion/${selected.id}/${accion}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        location.reload();
-    })
-    .catch(err => console.error(err));
-}
 </script>
+@endpush
+
+

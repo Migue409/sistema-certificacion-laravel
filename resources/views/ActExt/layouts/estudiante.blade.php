@@ -207,7 +207,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('estudiantes.certificacion') }}">
+                <a class="nav-link" href="{{ route('estudiantes.certificacionEST') }}">
                     <i class="fas fa-certificate"></i> Subir/Consultar Certificación de Nivel de Inglés
                 </a>
             </li>

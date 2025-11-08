@@ -20,6 +20,7 @@ use App\Models\TeamTask;
 use Faker\Provider\ar_EG\Person;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CertificacionController;
+use App\Http\Controllers\CertificacionEstudianteController;
 
 
 Route::prefix('api')->group(function () {
@@ -177,8 +178,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/certificacion/exportar', [CertificacionController::class, 'exportarExcel'])->name('certificacion.exportar');
     
     //Validaciones
-    Route::post('/certificacion/{id}/validar', [CertificacionController::class, 'validar'])->name('certificacion.validar');
+    Route::get('/certificacion/aprobar/{id}', [CertificacionController::class, 'aprobar'])->name('certificacion.aprobar');
     Route::post('/certificacion/{id}/rechazar', [CertificacionController::class, 'rechazar'])->name('certificacion.rechazar');
+
+    // Certificación (estudiante)
+    Route::get('/estudiantes/certificacionEST', [CertificacionEstudianteController::class, 'index'])->name('estudiantes.certificacionEST');
+    Route::post('/estudiantes/certificacionEST/registrar', [CertificacionEstudianteController::class, 'store'])->name('certificacionEST.store');
 
 });
 

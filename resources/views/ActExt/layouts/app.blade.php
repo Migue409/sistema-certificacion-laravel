@@ -262,6 +262,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
     </script>
     @stack('js')
+    @stack('scripts')
 </body>
 <footer class="footer">
     <strong> <a href="{{route('admin.tutoriales')}}">Tutoriales</a>.</strong>
