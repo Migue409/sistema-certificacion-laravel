@@ -24,9 +24,9 @@
 
     <p>
         La <b>Universidad Tecnológica de Tecámac</b>, a través de la <b>Coordinación de Inglés</b>,
-        certifica que <b>{{ $certificado->nombre }}</b>, con matrícula <b>{{ $certificado->matricula }}</b>,
+        certifica que el estudiante <b>{{ $certificado->nombre }}</b>, con matrícula <b>{{ $certificado->matricula }}</b>,
         ha acreditado satisfactoriamente el nivel <b>{{ $certificado->nivel_in }}</b> correspondiente a su formación
-        académica en la carrera de <b>{{ $certificado->division }}</b>.
+        académica en la división de <b>{{ $certificado->division }}</b>.
     </p>
 
     <p>
