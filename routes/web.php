@@ -178,8 +178,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/certificacion/exportar', [CertificacionController::class, 'exportarExcel'])->name('certificacion.exportar');
     
     //Validaciones
-    Route::get('/certificacion/aprobar/{id}', [CertificacionController::class, 'aprobar'])->name('certificacion.aprobar');
-    Route::post('/certificacion/{id}/rechazar', [CertificacionController::class, 'rechazar'])->name('certificacion.rechazar');
+    Route::post('/certificacion/aprobar/{id}/{accion}', [CertificacionController::class, 'aprobar'])->name('certificacion.aprobar');
+    Route::get('/certificacion/dictamen/{id}', [CertificacionController::class, 'generarDictamen'])->name('certificacion.dictamen');
+
 
     // Certificación (estudiante)
     Route::get('/estudiantes/certificacionEST', [CertificacionEstudianteController::class, 'index'])->name('estudiantes.certificacionEST');
@@ -187,7 +188,7 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-// Cerra Sesión
+// Cierra Sesión
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/aviso',[EstudiantesController::class, 'aviso'])->name('aviso');

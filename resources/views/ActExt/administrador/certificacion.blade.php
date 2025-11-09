@@ -55,7 +55,6 @@
 
         <div>
             <a href="{{ route('certificacion.exportar') }}" class="btn btn-success mr-2">Exportar en Excel</a>
-            <!--<a id="btnDictamen" href="#" class="btn btn-success" style="background-color:#90EE90; border-color:#90EE90;" disabled>Generar dictamen</a>-->
             <button id="btnDictamen" class="btn btn-success" disabled style="background-color:#90EE90; border-color:#90EE90;">Generar dictamen</button>
         </div>
     </div>
@@ -71,8 +70,7 @@
                 <th>Nivel</th>
                 <th>Certificado</th>
                 <th>Estatus</th>
-
-            </tr>
+        </tr>
         </thead>
         <tbody>
  <tbody>
@@ -85,7 +83,16 @@
             data-certificado="{{ $certificado->certificado }}">
             <td>{{ $certificado->nombre }}</td>
             <td>{{ $certificado->matricula }}</td>
-            <td>{{ $certificado->correo }}</td>
+            @php
+                $mensaje = $certificado->estatus === 'Aprobado'
+                ? "Estimado {$certificado->nombre},%0A%0ASu certificación ha sido validada exitosamente.%0A%0AFelicidades.%0A%0AAtentamente,%0ACoordinación de Inglés."
+                : "Estimado {$certificado->nombre},%0A%0ALamentamos informarle que su certificación fue rechazada.%0A%0AAtentamente,%0ACoordinación de Inglés.";
+            @endphp
+                <td>
+                    <a href="mailto:{{ $certificado->correo }}?subject=Resultado de certificación&body={{ $mensaje }}">
+                        {{ $certificado->correo }}
+                    </a>
+                </td>
             <td>{{ $certificado->division }}</td>
             <td>{{ $certificado->grupo_ingles }}</td>
             <td>{{ $certificado->nivel_in }}</td>
@@ -115,6 +122,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     filas.forEach(row => {
         row.addEventListener('click', function () {
+          const estatus = this.cells[7].textContent.trim(); // Columna 'Estatus'
+
             // Si la misma fila se vuelve a hacer clic → deselecciona
             if (selected === this) {
                 this.classList.remove('table-primary');
@@ -132,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.classList.add('table-primary');
             selected = this;
 
+            
             // Activa el botón
             btnDictamen.disabled = false;
             btnDictamen.style.backgroundColor = '#198754';
@@ -167,20 +177,33 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnRechazar').addEventListener('click', () => procesarDictamen('rechazar'));
 
     function procesarDictamen(accion) {
-        if (!selected) return;
+    if (!selected) return;
 
-        fetch(`/certificacion/${selected.dataset.id}/${accion}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
+    fetch(`/certificacion/aprobar/${selected.dataset.id}/${accion}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+
+        if (accion === 'validar') {
+            //  Genera el PDF en una pestaña nueva
+            const url = `/certificacion/dictamen/${selected.dataset.id}`;
+            const win = window.open(url, '_blank'); // abrir PDF en nueva pestaña
+
+            //  Espera un momento y recarga la tabla
+            setTimeout(() => {
+                location.reload();
+            }, 2500);
+        } else {
+            // Si es "rechazar", recarga normalmente
             location.reload();
-        })
+        }
+    })
         .catch(err => console.error(err));
     }
 });

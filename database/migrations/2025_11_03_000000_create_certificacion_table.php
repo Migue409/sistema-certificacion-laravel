@@ -6,13 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Crear tabla certificaciones
-     */
     public function up(): void
     {
         Schema::create('certificacion', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_usuario'); // FK al usuario
             $table->string('nombre', 255);
             $table->string('matricula', 20)->unique();
             $table->string('correo', 255);
@@ -21,12 +19,12 @@ return new class extends Migration
             $table->string('nivel_in', 50);
             $table->string('certificado', 50);
             $table->string('puntaje',255);
-            $table->string('archivo_pdf')->nullable();
-            $table->enum('estatus', ['Pendiente', 'Acreditado', 'No acreditado'])->default('Pendiente');
+            $table->string('archivo')->nullable();
+            $table->enum('estatus', ['Pendiente', 'Aprobado', 'Rechazado'])->default('Pendiente');
             $table->timestamps(); // created_at y updated_at
+            
+            $table->foreign('id_usuario')->references('id_usuario')->on('usuarios')->onDelete('cascade');
         });
-
-        $table->foreignId('id_usuario')->constrained('usuarios')->onDelete('cascade');
     }
 
     /**

@@ -45,32 +45,33 @@ class CertificacionController extends Controller
     return response()->json(['message' => 'Certificado rechazado.']);
 }
 
-public function rechazar($id)
+public function aprobar($id, $accion)
 {
-    $cert = Certificacion::findOrFail($id);
-    $cert->estatus = 'Rechazado';
-    $cert->save();
+    $certificado = Certificacion::where('id_usuario', $id)->first();
 
-    return response()->json(['message' => 'Certificado rechazado.']);
+    if (!$certificado) {
+        return response()->json(['message' => 'Certificado no encontrado'], 404);
+    }
+
+    $certificado->estatus = $accion === 'validar' ? 'Aprobado' : 'Rechazado';
+    $certificado->save();
+
+    return response()->json(['message' => "El certificado fue {$certificado->estatus} correctamente."]);
 }
 
-public function aprobar($id)
+public function generarDictamen($id_usuario)
 {
-    $certificacion = Certificacion::findOrFail($id);
-    $certificacion->estatus = 'Aprobado';
-    $certificacion->save();
+    $certificado = Certificacion::where('id_usuario', $id_usuario)->firstOrFail();
 
-    // Generar PDF automáticamente
-    $pdf = Pdf::loadView('ActExt.administrador.dictamen', compact('certificacion'));
+    if ($certificado->estatus !== 'Aprobado' && $certificado->estatus !== 'Aprobado') {
+        abort(403, 'El dictamen solo puede generarse para estudiantes aprobados.');
+    }
 
-    // Retornar el PDF como descarga inmediata
-    return $pdf->download('Dictamen_' . $certificacion->matricula . '.pdf');
+    $pdf = Pdf::loadView('ActExt.administrador.dictamen', [
+        'certificado' => $certificado
+    ]);
 
-    // Guardar en almacenamiento interno (storage/app/public/dictamenes)
-    Storage::disk('public')->put('dictamenes/' . $fileName, $pdf->output());
-
-    // Retornar descarga inmediata al administrador
-    return $pdf->download($fileName);
+    return $pdf->download('Dictamen_'.$certificado->matricula.'.pdf');
 }
 
 }

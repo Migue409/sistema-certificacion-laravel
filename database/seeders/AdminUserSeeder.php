@@ -17,7 +17,8 @@ class AdminUserSeeder extends Seeder
             [
                 'matricula' => '0241025987',
                 'nombre' => 'Administrador',
-                'curp' => 'ADMin12345?$',
+                'curp' => 'ADMIn12345?$',
+                'correo' => 'inglesuttec@gmail.com',
                 'id_rol' => 1,
                 'created_at' => now(), // Asignar fecha de creación
                 'updated_at' => now(), // Asignar fecha de actualización

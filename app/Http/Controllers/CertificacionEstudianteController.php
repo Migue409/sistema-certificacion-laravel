@@ -38,7 +38,7 @@ class CertificacionEstudianteController extends Controller
     Certificacion::updateOrCreate(
         ['id_usuario' => Auth::id()],
         [
-            'nombre' => Auth::user()->nombre,  // o 'name' si usas ese campo
+            'nombre' => Auth::user()->nombre, 
             'matricula' => Auth::user()->matricula,
             'correo' => Auth::user()->correo,
             'division' => $datosAcademicos->division,
