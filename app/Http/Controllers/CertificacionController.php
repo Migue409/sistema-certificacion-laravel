@@ -56,7 +56,7 @@ public function aprobar($id, $accion)
     $certificado->estatus = $accion === 'validar' ? 'Aprobado' : 'Rechazado';
     $certificado->save();
 
-    return response()->json(['message' => "El certificado fue {$certificado->estatus} correctamente."]);
+    return response()->json(['message' => "El certificado ha sido {$certificado->estatus}."]);
 }
 
 public function generarDictamen($id_usuario)
